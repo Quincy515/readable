@@ -87,6 +87,8 @@ npm install css-loader style-loader react-css-modules
 
 其它所有目录包括 第三方组件 中的样式都是全局的。
 
+[修改readable/config/webpack.config.dev.js 添加 exclude\include\modules:true\localIdentName](https://github.com/custertian/readable/commit/44ac211f45e605493bb128b55d785d022579acfa#diff-98e693d57f0f3de077b4cbf1e156492fR201)
+
 ```
 {
   test: /\.css$/,
@@ -253,7 +255,7 @@ render() {
 ```
 ![](http://ovc37dj11.bkt.clouddn.com/15059095812222.jpg)
 
-ListView.js此时全部代码： [这是到这里为止中所做的更改]()
+ListView.js此时全部代码： [这是到这里为止中所做的更改](https://github.com/custertian/readable/commit/44ac211f45e605493bb128b55d785d022579acfa#diff-92a59bcb29677c04419ca01dd4e9b591R1)
 
 ```
 import React from 'react'
