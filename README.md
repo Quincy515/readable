@@ -315,5 +315,72 @@ export default class ListView extends React.Component {
 }
 ```
 
-### 4. 使用 antd 和 CSS Modules 美化评论列表页面
+### 4. 使用 antd 和 CSS Modules 美化列表页面
+
+![](http://ovc37dj11.bkt.clouddn.com/15059672155808.jpg)
+
+[antd 表格 远程加载数据](https://ant.design/components/table-cn/#components-table-demo-ajax)
+
+```
+      <Table columns={columns}
+        rowKey={record => record.id}
+        dataSource={this.state.data}
+        pagination={this.state.pagination}
+        loading={this.state.loading}
+        onChange={this.handleTableChange}
+      />
+```
+
+[Column](https://ant.design/components/table-cn/#Column)
+
+列描述数据对象，是 columns 中的一项，Column 使用相同的 API
+
+```
+const columns = [{
+  title: 'Vote',
+  width: '5%',
+  dataIndex: 'index',
+  render: (text, record) => (
+    <span>
+      <Icon type="like-o" onClick={()=>_voteForLink()} style={{cursor: 'pointer'}} />
+      <span className="ant-divider" />
+      <Icon type="dislike-o" onClick={()=>_voteForLink()} style={{cursor: 'pointer'}} />
+    </span>
+  ),
+}, {
+  title: 'Score',
+  dataIndex: 'voteScore',
+  sorter: (a, b) => a.voteScore - b.voteScore,
+  width: '7%',
+}, {
+  title: 'Title',
+  dataIndex: 'title',
+  width: '30%',
+}, {
+  title: 'Date',
+  dataIndex: 'timestamp',
+  width: '10%',
+  sorter: (a, b) => a.timestamp - b.timestamp,
+}, {
+  title: 'Author',
+  dataIndex: 'author',
+  width: '10%',
+}, {
+  title: 'Comments',
+  dataIndex: 'comments'
+},{
+  title: 'Action',
+  key: 'action',
+  render: (text, record) => (
+    <span>
+      <Link to="/">Editor</Link>
+      <span className="ant-divider" />
+      <Link to="/">Delete</Link>
+    </span>
+  ),
+}];
+```
+
+[本次修改代码的提交记录]()
+
 
