@@ -7,7 +7,8 @@ if (!token)
 console.log(token)
 const headers = {
   'Accept': 'application/json',
-  'Authorization': token
+  'Authorization': token,
+  'Content-Type': 'application/json',
 }
 
 /**
@@ -32,4 +33,22 @@ export const fetchPost = () => {
   //   this.setState({loading: false, data: res.data, pagination})
   //   console.log(res)
   // })
+}
+
+
+/**
+ * POST /posts/:id
+ *    USAGE:
+ *        Used for voting on a post
+ *      PARAMS:
+ *        option - String: Either "upVote" or "downVote"
+ */
+export const VotePost = (postId, option, callback) => {
+  const request = axios({
+    method: 'post',
+    url: `${api}/posts/${postId}`,
+    data: {option: option},
+    headers: { ...headers }
+  }).then(() => callback())
+  return request
 }

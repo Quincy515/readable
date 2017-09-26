@@ -1103,7 +1103,193 @@ export default connect(mapStateToProps, mapDispatchToProps)(ListView)
 1. API 和 setState 的使用
 2. loading: true 应该怎么使用
 
-[此次代码的修改]()
+[此次代码的修改](https://github.com/custertian/readable/commit/70b2929ed60ab2405bc05f14e8ac8ddd40bf63a0)
 
+### 12. vote 功能书写
+
+在 API.js 中增加 vote 功能的 api 请求代码：
+
+```
+/**
+ * POST /posts/:id
+ *    USAGE:
+ *        Used for voting on a post
+ *      PARAMS:
+ *        option - String: Either "upVote" or "downVote"
+ */
+export const VotePost = (postId, option, callback) => {
+  axios({
+    method: 'post',
+    url: `${api}/posts/${postId}`,
+    data: {option: option},
+    headers: { ...headers }
+  }).then(() =>  callback())
+}
+```
+
+在 actions posts.js 中增加 vote 
+
+```
+// vote 投票
+export const voteAction = (postId, option) => {
+  return {
+    type: ActionType.VOTE,
+    postId,
+    option,
+  }
+}
+export const voteChange = (postId, option, callback) => {
+  console.log(callback)
+  return dispatch => {
+    API.VotePost(postId, option, callback).then(data => dispatch(voteAction(data)))
+  }
+}
+```
+
+在 reducers posts.js 中增加 ActionType.VOTE
+
+```
+    case ActionType.VOTE:
+      console.log('$$ reducer posts')
+      const newState = { ...state }
+      if(action.option==='upVote'){
+        newState[action.postId]['voteScore'] = ++newState[action.postId]['voteScore']
+      }else if(action.option==='downVote'){
+        newState[action.postId]['voteScore'] = --newState[action.postId]['voteScore']
+      }
+      return newState
+```
+
+最后在 ListView.js 中连接 reducers 和 actions
+
+```
+import React from 'react'
+import { Icon, Table } from 'antd';
+import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { addPost, voteChange } from '../actions/posts'
+import * as API from '../utils/Api'
+
+class ListView extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      pagination: {},
+      loading: false,
+    }
+    // this.loading = this.state.loading
+  }
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination };
+    pager.current = pagination.current;
+    this.setState({
+      loading: true,
+      pagination: pager,
+    });
+    API.fetchPost().then(res => {
+      const pagination = {
+        ...this.state.pagination
+      }
+      pagination.total = res.data.length
+      this.setState({ loading: false, pagination})
+      // console.log('排序',res.data.length)
+    })
+  }
+  componentDidMount() {
+    this.props.fetchAllPosts();
+    // console.log(this.props.fetchAllPosts())
+  }
+  _voteForLink = async (postId, option) => {
+    this.props.vote(postId.id, option,()=>{
+      window.location.reload()
+      // this.props.history.push('/')
+    })
+  }
+  render() {
+    // console.log('Props', this.props)
+    const { posts } = this.props
+    if (!posts){
+      // this.loading = true
+      return <div>Loading ...</div>
+    }
+    console.log('posts', posts)
+
+    const columns = [{
+      title: 'Vote',
+      width: '5%',
+      dataIndex: 'index',
+      render: (text, record) => (
+        <span>
+          <Icon type="like-o" onClick={()=>{
+            const id = record.id;
+            this._voteForLink({id}, 'upVote')}} style={{cursor: 'pointer'}} />
+          <span className="ant-divider" />
+          <Icon type="dislike-o" onClick={()=>{
+            const id = record.id;
+            this._voteForLink({id}, 'downVote')}} style={{cursor: 'pointer'}} />
+        </span>
+      ),
+    }, {
+      title: 'Score',
+      dataIndex: 'voteScore',
+      sorter: (a, b) => a.voteScore - b.voteScore,
+      width: '7%',
+    }, {
+      title: 'Title',
+      dataIndex: 'title',
+      width: '30%',
+    }, {
+      title: 'Date',
+      dataIndex: 'timestamp',
+      width: '10%',
+      sorter: (a, b) => a.timestamp - b.timestamp,
+      render: text => <span>{(new Date(text)).toLocaleString()}</span>,
+    }, {
+      title: 'Author',
+      dataIndex: 'author',
+      width: '10%',
+    }, {
+      title: 'Comments',
+      dataIndex: 'comments'
+    },{
+      title: 'Action',
+      key: 'action',
+      render: (text, record) => (
+        <span>
+          <Link to="/">Editor</Link>
+          <span className="ant-divider" />
+          <Link to="/">Delete</Link>
+        </span>
+      ),
+    }];
+
+    return (
+      <Table columns={columns}
+        rowKey={record => record.id}
+        dataSource={posts}
+        pagination={this.state.pagination}
+        loading={this.state.loading}
+        onChange={this.handleTableChange}
+      />
+    )
+  }
+}
+const mapStateToProps = (state, props) => {
+  // console.log('state', state)
+  // console.log('props', props)
+  return { posts: state.data };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return{
+    fetchAllPosts: (data) => dispatch(addPost()),
+    vote: (postId, option, callback) => dispatch(voteChange(postId, option, callback)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListView)
+```
+
+[此次修改的代码 提交记录]()
 
 

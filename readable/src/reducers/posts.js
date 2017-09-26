@@ -15,6 +15,17 @@ const AllPostsReducer = (state=[], action) => {
       //   data,     // 修改状态
       // }
       return action.posts
+
+    case ActionType.VOTE:
+      console.log('$$ reducer posts')
+      const newState = { ...state }
+      if(action.option==='upVote'){
+        newState[action.postId]['voteScore'] = ++newState[action.postId]['voteScore']
+      }else if(action.option==='downVote'){
+        newState[action.postId]['voteScore'] = --newState[action.postId]['voteScore']
+      }
+      return newState
+
     default:
       return state
   }
