@@ -922,7 +922,7 @@ const mapStateToProps = (state, props) => {
 export default connect(mapStateToProps, {addPost})(ListView)
 ```
 
-mapDispatchToProps 的使用是包裹 action creator 的 dispatch 方法，在组件中直接调用 mapDispatchToProps 方法就可以[此次修改的代码可以查看]()
+mapDispatchToProps 的使用是包裹 action creator 的 dispatch 方法，在组件中直接调用 mapDispatchToProps 方法就可以[此次修改的代码可以查看](https://github.com/custertian/readable/commit/63e3d739f07066436e04a624eb74859c28c6a188)
 
 ```
 # File: src/App.js
@@ -981,4 +981,129 @@ ReactDOM.render(
   </Provider>, document.getElementById('root'));
 registerServiceWorker();
 ```
+
+### 11. antd 美化 + 排序
+
+```
+# File: src/components/ListView.js
+
+import React from 'react'
+import { Icon, Table } from 'antd';
+import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { addPost } from '../actions/posts'
+import * as API from '../utils/Api'
+
+const columns = [{
+  title: 'Vote',
+  width: '5%',
+  dataIndex: 'index',
+  render: (text, record) => (
+    <span>
+      <Icon type="like-o" onClick={()=>_voteForLink()} style={{cursor: 'pointer'}} />
+      <span className="ant-divider" />
+      <Icon type="dislike-o" onClick={()=>_voteForLink()} style={{cursor: 'pointer'}} />
+    </span>
+  ),
+}, {
+  title: 'Score',
+  dataIndex: 'voteScore',
+  sorter: (a, b) => a.voteScore - b.voteScore,
+  width: '7%',
+}, {
+  title: 'Title',
+  dataIndex: 'title',
+  width: '30%',
+}, {
+  title: 'Date',
+  dataIndex: 'timestamp',
+  width: '10%',
+  sorter: (a, b) => a.timestamp - b.timestamp,
+}, {
+  title: 'Author',
+  dataIndex: 'author',
+  width: '10%',
+}, {
+  title: 'Comments',
+  dataIndex: 'comments'
+},{
+  title: 'Action',
+  key: 'action',
+  render: (text, record) => (
+    <span>
+      <Link to="/">Editor</Link>
+      <span className="ant-divider" />
+      <Link to="/">Delete</Link>
+    </span>
+  ),
+}];
+const _voteForLink = async () => {
+  console.log('voteForLink')
+}
+
+
+class ListView extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      pagination: {},
+      loading: false,
+    }
+  }
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination };
+    pager.current = pagination.current;
+    this.setState({
+      pagination: pager,
+    });
+    API.fetchPost().then(res => {
+      const pagination = {
+        ...this.state.pagination
+      }
+      pagination.total = res.data.length
+      this.setState({loading: false, pagination})
+    })
+  }
+  componentDidMount() {
+    this.props.fetchAllPosts();
+  }
+  render() {
+    const { posts } = this.props
+    if (!posts){
+      return <div>Loading...</div>
+    }
+    return (
+      <Table columns={columns}
+        rowKey={record => record.id}
+        dataSource={posts}
+        pagination={this.state.pagination}
+        loading={this.state.loading}
+        onChange={this.handleTableChange}
+      />
+    )
+  }
+}
+const mapStateToProps = (state, props) => {
+  return { posts: state.data };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return{
+    fetchAllPosts: (data) => dispatch(addPost())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListView)
+```
+
+**⚠️注意⚠️**这里使用了 API.js 和 setState 因为这里是分页功能
+
+所以这里有两个问题：
+
+1. API 和 setState 的使用
+2. loading: true 应该怎么使用
+
+[此次代码的修改]()
+
+
 
