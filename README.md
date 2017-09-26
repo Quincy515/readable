@@ -922,6 +922,8 @@ const mapStateToProps = (state, props) => {
 export default connect(mapStateToProps, {addPost})(ListView)
 ```
 
+mapDispatchToProps 的使用是包裹 action creator 的 dispatch 方法，在组件中直接调用 mapDispatchToProps 方法就可以[此次修改的代码可以查看]()
+
 ```
 # File: src/App.js
 

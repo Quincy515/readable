@@ -82,7 +82,7 @@ class ListView extends React.Component {
   //   this.fetchPost()
   // }
   componentDidMount() {
-    this.props.addPost();
+    this.props.fetchAllPosts();
     // console.log(this.props.fetchAllPosts())
   }
   render() {
@@ -136,4 +136,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default connect(mapStateToProps, {addPost})(ListView)
+export default connect(mapStateToProps, mapDispatchToProps)(ListView)
