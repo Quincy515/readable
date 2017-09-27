@@ -5,7 +5,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 import { createStore, applyMiddleware } from 'redux'
-import reducer from './reducers/posts'
+import rootReducer from './reducers/reducers'
 
 import { Provider } from 'react-redux'
 
@@ -17,7 +17,7 @@ import thunk from 'redux-thunk'
 // console.log(store)
 
 const store = createStore(
-  reducer,
+  rootReducer,
   composeWithDevTools(
     applyMiddleware(thunk)
   )

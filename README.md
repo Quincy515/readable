@@ -1290,6 +1290,294 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(mapStateToProps, mapDispatchToProps)(ListView)
 ```
 
-[此次修改的代码 提交记录]()
+[此次修改的代码 提交记录](https://github.com/custertian/readable/commit/fc6ea5b11119d1b22fe3ae15eb80640aad71bfb3)
 
+### 13. 添加 Category
+
+```
+# File: src/containers/Layout.js
+
+import React from 'react'
+import { Layout, Menu, Breadcrumb } from 'antd';
+
+import ListView from '../components/ListView'
+
+const { Header, Content, Footer } = Layout;
+
+class LayoutView extends React.Component {
+  render() {
+    return(
+      <Layout className="layout">
+        <Header>
+          <div className="logo" />
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={['']}
+            style={{ lineHeight: '64px' }}
+          >
+            <Menu.Item key="1">react</Menu.Item>
+            <Menu.Item key="2">redux</Menu.Item>
+            <Menu.Item key="3">udacity</Menu.Item>
+          </Menu>
+        </Header>
+        <Content style={{ padding: '0 50px' }}>
+          <Breadcrumb style={{ margin: '12px 0' }}>
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>All Posts</Breadcrumb.Item>
+            {/* <Breadcrumb.Item></Breadcrumb.Item> */}
+          </Breadcrumb>
+          <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+            <h1>All Posts</h1>
+            <ListView/>
+          </div>
+        </Content>
+        <Footer style={{ textAlign: 'center' }}>
+          Custer Tian ©2017 Created by Custer Tian
+        </Footer>
+      </Layout>
+    )
+  }
+}
+
+export default LayoutView
+```
+
+修改 App.js 的路由
+
+```
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+
+import Layout from './containers/Layout'
+
+class App extends Component {
+  render() {
+    return (
+      <Router>
+        <div>
+          <Route exact path='/' component={Layout}/>
+        </div>
+      </Router>
+    );
+  }
+}
+
+export default App
+```
+
+![](http://ovc37dj11.bkt.clouddn.com/15064814427710.jpg)
+
+
+```
+#File: src/utils/API.js
+
+/**
+ * GET /categories
+ *    USAGE:
+ *      Get all of the categories available for the app. List is found in categories.js.
+ *      Feel free to extend this list as you desire.
+ */
+export const fetchCategories = () => {
+  return axios ({
+    method: 'get',
+    url: `${api}/categories`,
+    headers: { ...headers }
+  })
+}
+```
+
+```
+#File: src/actions/constants.js
+
+export const ALL_CATEGORIES = 'ALL_CATEGORIES'  // 获取所有分类
+```
+
+```
+#File: src/actions/categories.js
+
+// 获取所有分类
+export const CategoriesAction = (categories) => {
+  return {
+    type: ActionType.ALL_CATEGORIES,
+    categories,
+  }
+}
+
+export const CategoriesFunc = () => {
+  return dispatch => {
+    API.fetchCategories().then(data => dispatch(CategoriesAction(data)))
+  }
+}
+```
+
+```
+#File: src/reducers/categories.js
+
+import * as ActionType from '../actions/constants'
+
+const reducer = (state=[], action) => {
+  switch(action.type){
+    case ActionType.ALL_CATEGORIES:
+      return action.categories
+    default:
+      return state
+  }
+}
+
+export default reducer 
+```
+
+要创建一个 store, Redux 的 createStore 方法只能接受一个 reducer
+
+我们将在更高的一个层级上创建一个 reducer
+
+它使用 组合 来调用其他两个 reducer 
+
+```
+#File: src/reducers/reducers.js
+
+import { combineReducers } from 'redux'
+import Categories from './categories'
+import Posts from './posts'
+
+const rootReducer = combineReducers({
+  categories: Categories,
+  posts: Posts,
+})
+
+export default rootReducer
+```
+
+修改 store
+
+```
+#File: src/index.js
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css'
+import App from './App';
+import registerServiceWorker from './registerServiceWorker';
+
+import { createStore, applyMiddleware } from 'redux'
+import rootReducer from './reducers/reducers' // 修改1
+
+import { Provider } from 'react-redux'
+
+import { composeWithDevTools } from 'redux-devtools-extension'
+import thunk from 'redux-thunk'
+
+const store = createStore(
+  rootReducer,                              // 修改2
+  composeWithDevTools(
+    applyMiddleware(thunk)
+  )
+)
+
+ReactDOM.render(
+  <Provider store={ store }>
+    <App />
+  </Provider>, document.getElementById('root'));
+registerServiceWorker();
+```
+
+修改 ListView.js
+
+```
+const mapStateToProps = (state, props) => {
+  // console.log('state', state)
+  // console.log('props', props)
+  return { posts: state.data };
+}
+```
+
+=====>>>>
+
+```
+const mapStateToProps = ({posts}) => {
+  // console.log('state', state)
+  // console.log('props', props)
+  return { posts: posts.data };
+}
+```
+
+修改 Layout.js
+
+```
+# File: src/containers/Layout.js
+
+// 展示组件
+import React from 'react'
+import { connect } from 'react-redux'
+import { Layout, Menu, Breadcrumb } from 'antd';
+
+import ListView from '../components/ListView'
+import { CategoriesFunc } from '../actions/categories'
+
+const { Header, Content, Footer } = Layout;
+
+class LayoutView extends React.Component {
+  componentDidMount(){
+    this.props.fetchCategories()
+  }
+  render() {
+    const { categories } = this.props
+    // console.log(categories)
+
+    if(categories){
+      console.log(categories.categories)
+    }
+
+    return(
+      <Layout className="layout">
+        <Header>
+          <div className="logo" />
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={['']}
+            style={{ lineHeight: '64px' }}
+          >
+            <Menu.Item key="categories">Categories:</Menu.Item>
+            {categories
+              &&(categories.categories.map((item) => (
+              <Menu.Item key={item.name}>{item.name}</Menu.Item>
+            )))}
+            {/* <Menu.Item key="1">react</Menu.Item>
+            <Menu.Item key="2">redux</Menu.Item>
+            <Menu.Item key="3">udacity</Menu.Item> */}
+          </Menu>
+        </Header>
+        <Content style={{ padding: '0 50px' }}>
+          <Breadcrumb style={{ margin: '12px 0' }}>
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>All Posts</Breadcrumb.Item>
+            {/* <Breadcrumb.Item></Breadcrumb.Item> */}
+          </Breadcrumb>
+          <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+            <h1>All Posts</h1>
+            <ListView/>
+          </div>
+        </Content>
+        <Footer style={{ textAlign: 'center' }}>
+          Custer Tian ©2017 Created by Custer Tian
+        </Footer>
+      </Layout>
+    )
+  }
+}
+const mapStateToProps = (state,props) => {
+  // console.log(categories.data)
+  // console.log('state', state)
+  // console.log('props', props)
+  return { categories: state.categories['data'] };
+}
+const mapDispatchToProps = (dispatch) => {
+  return{
+    fetchCategories: (data) => dispatch(CategoriesFunc()),
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(LayoutView)
+```
 

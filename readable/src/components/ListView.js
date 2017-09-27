@@ -109,10 +109,10 @@ class ListView extends React.Component {
     )
   }
 }
-const mapStateToProps = (state, props) => {
+const mapStateToProps = ({posts}) => {
   // console.log('state', state)
   // console.log('props', props)
-  return { posts: state.data };
+  return { posts: posts.data };
 }
 
 const mapDispatchToProps = (dispatch) => {

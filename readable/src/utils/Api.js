@@ -4,13 +4,26 @@ const api = 'http://localhost:3001'
 let token = localStorage.token
 if (!token)
   token = localStorage.token = Math.random().toString(36).substr(-8)
-console.log(token)
+// console.log('token', token)
 const headers = {
   'Accept': 'application/json',
   'Authorization': token,
   'Content-Type': 'application/json',
 }
 
+/**
+ * GET /categories
+ *    USAGE:
+ *      Get all of the categories available for the app. List is found in categories.js.
+ *      Feel free to extend this list as you desire.
+ */
+export const fetchCategories = () => {
+  return axios ({
+    method: 'get',
+    url: `${api}/categories`,
+    headers: {...headers}
+  })
+}
 /**
  * GET /posts
  *    USAGE:
