@@ -1292,7 +1292,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(ListView)
 
 [此次修改的代码 提交记录](https://github.com/custertian/readable/commit/fc6ea5b11119d1b22fe3ae15eb80640aad71bfb3)
 
-### 13. 添加 Category
+### 13. 添加 Category List
+
+#### 第一步：☝️ 新建 Layout.js 展示 categories 列表
 
 ```
 # File: src/containers/Layout.js
@@ -1343,7 +1345,7 @@ class LayoutView extends React.Component {
 export default LayoutView
 ```
 
-修改 App.js 的路由
+#### 第二步： 修改 App.js 的路由
 
 ```
 import React, { Component } from 'react';
@@ -1368,7 +1370,7 @@ export default App
 
 ![](http://ovc37dj11.bkt.clouddn.com/15064814427710.jpg)
 
-
+#### 第三步： 增加 API 的 categories 请求
 ```
 #File: src/utils/API.js
 
@@ -1387,12 +1389,15 @@ export const fetchCategories = () => {
 }
 ```
 
+#### 第四步： 增加 actions 常量
+
 ```
 #File: src/actions/constants.js
 
 export const ALL_CATEGORIES = 'ALL_CATEGORIES'  // 获取所有分类
 ```
 
+#### 第五步： 增加 actions creator categories.js
 ```
 #File: src/actions/categories.js
 
@@ -1410,7 +1415,7 @@ export const CategoriesFunc = () => {
   }
 }
 ```
-
+#### 第六步： 增加 reducers categories.js
 ```
 #File: src/reducers/categories.js
 
@@ -1434,6 +1439,8 @@ export default reducer
 
 它使用 组合 来调用其他两个 reducer 
 
+#### 第七步： combineReducers 组合两个 reducers
+
 ```
 #File: src/reducers/reducers.js
 
@@ -1449,7 +1456,7 @@ const rootReducer = combineReducers({
 export default rootReducer
 ```
 
-修改 store
+#### 第八步： 修改 store
 
 ```
 #File: src/index.js
@@ -1482,7 +1489,7 @@ ReactDOM.render(
 registerServiceWorker();
 ```
 
-修改 ListView.js
+#### 第九步：修改 ListView.js
 
 ```
 const mapStateToProps = (state, props) => {
@@ -1495,6 +1502,16 @@ const mapStateToProps = (state, props) => {
 =====>>>>
 
 ```
+const mapStateToProps = (state, props) => {
+  // console.log('state', state)
+  // console.log('props', props)
+  return { posts: state.posts.data };
+}
+```
+
+或者可以改成：
+
+```
 const mapStateToProps = ({posts}) => {
   // console.log('state', state)
   // console.log('props', props)
@@ -1502,7 +1519,7 @@ const mapStateToProps = ({posts}) => {
 }
 ```
 
-修改 Layout.js
+#### 第十步： 把 store actions 连接到 Layout.js
 
 ```
 # File: src/containers/Layout.js
@@ -1580,4 +1597,73 @@ const mapDispatchToProps = (dispatch) => {
 }
 export default connect(mapStateToProps, mapDispatchToProps)(LayoutView)
 ```
+
+![](http://ovc37dj11.bkt.clouddn.com/15064931194320.jpg)
+
+[此次提交修改的代码](https://github.com/custertian/readable/commit/34772b15b1babc30103bb34ef68016e3b0b70d76#diff-7cb48bd8bf1c05c75667115932620d72L1)
+
+### 14. 获取一个分类下面的所有posts
+
+#### 第一步：增加 API 请求
+
+```
+#File: src/utils/API.js
+
+/**
+ * GET /:category/posts
+ *   USAGE:
+ *     Get all of the posts for a particular category
+ */
+
+export const fetchCategoryPosts = (category) => {
+  return axios({
+    method: 'get',
+    url: `${api}/${category}/posts`,
+    headers: {...headers}
+  })
+}
+```
+
+#### 第二步： 增加 constants 常量
+
+```
+#File: src/actions/constants.js
+
+export const CATEGORY_POSTS = 'CATEGORY_POSTS'  // 获取一个分类下的所有posts
+```
+
+#### 第三步： 增加 actions creator 
+
+```
+#File: src/actions/categories.js
+
+// 获取一个分类下的所有posts
+export const CategoryPostsAction = (category,posts) => {
+  return {
+    type: ActionType.CATEGORY_POSTS,
+    category,
+    posts
+  }
+}
+
+export const CategoryPostsFunc = () => {
+  return dispatch => {
+    API.fetchCategoryPosts().then(data => dispatch(CategoryPostsAction(data)))
+  }
+}
+```
+
+#### 第四步： 增加 reducers 
+
+**⚠️注意⚠️**因为是返回的是 posts 内容，所以应该放在 posts.js 里
+```
+#File: src/reducers/posts.js
+
+case ActionType.CATEGORY_POSTS:
+      return action.categoryPosts
+```
+
+#### 第五步： 修改 ListView.js 和 Layout.js
+
+[改动在这里查看]()
 

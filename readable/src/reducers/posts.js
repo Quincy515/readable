@@ -26,6 +26,9 @@ const AllPostsReducer = (state=[], action) => {
       }
       return newState
 
+    case ActionType.CATEGORY_POSTS:
+      return action.categoryPosts
+
     default:
       return state
   }

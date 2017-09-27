@@ -2,7 +2,7 @@ import React from 'react'
 import { Icon, Table } from 'antd';
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { addPost, voteChange } from '../actions/posts'
+import {  voteChange } from '../actions/posts'
 import * as API from '../utils/Api'
 
 class ListView extends React.Component {
@@ -31,7 +31,7 @@ class ListView extends React.Component {
     })
   }
   componentDidMount() {
-    this.props.fetchAllPosts();
+    // this.props.fetchAllPosts();
     // console.log(this.props.fetchAllPosts())
   }
   _voteForLink = async (postId, option) => {
@@ -101,7 +101,7 @@ class ListView extends React.Component {
     return (
       <Table columns={columns}
         rowKey={record => record.id}
-        dataSource={posts}
+        dataSource={this.props.posts}
         pagination={this.state.pagination}
         loading={this.state.loading}
         onChange={this.handleTableChange}
@@ -109,15 +109,15 @@ class ListView extends React.Component {
     )
   }
 }
-const mapStateToProps = ({posts}) => {
+const mapStateToProps = (state, props) => {
   // console.log('state', state)
   // console.log('props', props)
-  return { posts: posts.data };
+  return { posts: state.posts.data };
 }
 
 const mapDispatchToProps = (dispatch) => {
   return{
-    fetchAllPosts: (data) => dispatch(addPost()),
+    // fetchAllPosts: (data) => dispatch(addPost()),
     vote: (postId, option, callback) => dispatch(voteChange(postId, option, callback)),
   }
 }

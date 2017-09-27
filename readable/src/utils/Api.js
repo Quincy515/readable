@@ -24,6 +24,21 @@ export const fetchCategories = () => {
     headers: {...headers}
   })
 }
+
+/**
+ * GET /:category/posts
+ *   USAGE:
+ *     Get all of the posts for a particular category
+ */
+
+export const fetchCategoryPosts = (category) => {
+  return axios({
+    method: 'get',
+    url: `${api}/${category}/posts`,
+    headers: {...headers}
+  })
+}
+
 /**
  * GET /posts
  *    USAGE:

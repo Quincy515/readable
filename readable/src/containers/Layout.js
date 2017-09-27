@@ -1,23 +1,44 @@
 // 展示组件
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { Layout, Menu, Breadcrumb } from 'antd';
 
 import ListView from '../components/ListView'
-import { CategoriesFunc } from '../actions/categories'
+import { addPost } from '../actions/posts'
+import { CategoriesFunc, CategoryPostsFunc } from '../actions/categories'
 
 const { Header, Content, Footer } = Layout;
 
 class LayoutView extends React.Component {
+  constructor(props){
+    super(props)
+    this.state={
+      curCategory: null,
+    }
+  }
   componentDidMount(){
     this.props.fetchCategories()
+    this.props.fetchAllPosts()
+  }
+  handleClick (e) {
+    // console.log(e.key)
+    if(e.key){
+      if(e.key==='categories'){
+        this.props.fetchAllPosts()
+        this.setState({ curCategory: 'All Posts'})
+      }else{
+        this.props.fetchCategoryPosts(e.key)
+        this.setState({ curCategory: e.key})
+      }
+    }
   }
   render() {
     const { categories } = this.props
     // console.log(categories)
 
     if(categories){
-      console.log(categories.categories)
+      // console.log(categories.categories)
     }
 
     return(
@@ -27,13 +48,16 @@ class LayoutView extends React.Component {
           <Menu
             theme="dark"
             mode="horizontal"
-            defaultSelectedKeys={['']}
+            defaultSelectedKeys={['categories']}
             style={{ lineHeight: '64px' }}
+            onClick={this.handleClick.bind(this)}
           >
             <Menu.Item key="categories">Categories:</Menu.Item>
             {categories
               &&(categories.categories.map((item) => (
-              <Menu.Item key={item.name}>{item.name}</Menu.Item>
+              <Menu.Item key={item.name}>
+                {item.name}
+              </Menu.Item>
             )))}
             {/* <Menu.Item key="1">react</Menu.Item>
             <Menu.Item key="2">redux</Menu.Item>
@@ -42,13 +66,12 @@ class LayoutView extends React.Component {
         </Header>
         <Content style={{ padding: '0 50px' }}>
           <Breadcrumb style={{ margin: '12px 0' }}>
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>All Posts</Breadcrumb.Item>
-            {/* <Breadcrumb.Item></Breadcrumb.Item> */}
+            <Breadcrumb.Item><Link to='/'>Home</Link></Breadcrumb.Item>
+            <Breadcrumb.Item><Link to='/'>Posts</Link></Breadcrumb.Item>
           </Breadcrumb>
           <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
-            <h1>All Posts</h1>
-            <ListView/>
+            {this.state.curCategory?<h1>{this.state.curCategory}</h1>:<h1>All Posts</h1>}
+            <ListView posts={this.props.posts}/>
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
@@ -58,15 +81,22 @@ class LayoutView extends React.Component {
     )
   }
 }
-const mapStateToProps = (state,props) => {
+const mapStateToProps = (state, props) => {
   // console.log(categories.data)
-  // console.log('state', state)
+  // console.log('state', state.posts)
   // console.log('props', props)
-  return { categories: state.categories['data'] };
+  return {
+    posts: state.posts.data,
+    categories: state.categories['data'],
+    categoryPosts: state.categoryPosts,
+   };
 }
 const mapDispatchToProps = (dispatch) => {
   return{
+    fetchAllPosts: (data) => dispatch(addPost()),
+
     fetchCategories: (data) => dispatch(CategoriesFunc()),
+    fetchCategoryPosts: (category) => dispatch(CategoryPostsFunc(category)),
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(LayoutView)

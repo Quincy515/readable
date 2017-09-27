@@ -14,3 +14,17 @@ export const CategoriesFunc = () => {
     API.fetchCategories().then(data => dispatch(CategoriesAction(data)))
   }
 }
+
+// 获取一个分类下的所有posts
+export const CategoryPostsAction = (categoryPosts) => {
+  return {
+    type: ActionType.CATEGORY_POSTS,
+    categoryPosts,
+  }
+}
+
+export const CategoryPostsFunc = (category) => {
+  return dispatch => {
+    API.fetchCategoryPosts(category).then(data => dispatch(CategoryPostsAction(data)))
+  }
+}
