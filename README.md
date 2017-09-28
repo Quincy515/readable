@@ -1938,6 +1938,23 @@ showModal(e) {
 
 ```this.props.newPostModal()```
 
+**⚠️注意⚠️** showModal 函数,这里使用箭头函数会出错
+
+```
+showModal = (e) => {
+    this.props.newPostModal()
+  }
+  
+  ·····
+  
+  <Button type="primary" onClick={this.showModal(this)} icon="plus" style={{float: 'right'}} ghost>Add Post</Button>
+            {this.props.visible?<AddPost/>:<p></p>}
+```
+
+![](http://ovc37dj11.bkt.clouddn.com/15065714149314.jpg)
+
+不知道为什么 会自动调用  this.props.newPostModal(), 总是自动打开 Modal
+
 #### 第六步： 完善 AddPost.js 代码 点击关闭 Modal 对话框
 
 ```
@@ -1961,6 +1978,142 @@ const mapDispatchToProps = (dispatch) => {
 
 在不同组件中使用同一个 state 状态控制 Modal 可见还是隐藏
 
+[此次更新的代码](https://github.com/custertian/readable/commit/aea07c92bbbf470ab1f34d8ddc0e49c6816aa17b#diff-7cb48bd8bf1c05c75667115932620d72R37)
+
+
+#### 第七步： 在 Modal 里面添加 Form 表单
+
+[弹出层中的新建表单](https://ant.design/components/form-cn/)
+
+当用户访问一个展示了某个列表的页面，想新建一项但又不想跳转页面时，可以用 Modal 弹出一个表单，用户填写必要信息后创建新的项。
+
+[表单数据存储于上层组件](https://ant.design/components/form-cn/)
+
+通过使用 onFieldsChange 与 mapPropsToFields，可以把表单的数据存储到上层组件或者 Redux、dva 中，[更多可参考 rc-form 示例。](https://react-component.github.io/form/examples/redux.html)
+
+```
+import React from 'react'
+import {connect} from 'react-redux'
+import {Modal, Form, Input, Select} from 'antd';
+
+import {closeNewPostModal} from '../actions/modalvisible'
+const Option = Select.Option;
+const FormItem = Form.Item;
+// 展示组件
+const NewPostForm = Form.create()((props) => {
+  const {categories, visible, onCancel, onCreate, form, confirmLoading} = props;
+  const {getFieldDecorator} = form;
+  return (
+    <Modal
+      visible={visible}
+      title="Create a new post"
+      kText="Create"
+      onCancel={onCancel}
+      onOk={onCreate}
+      confirmLoading={confirmLoading}>
+      <Form layout="vertical">
+        <FormItem label="Title For Post">
+          {getFieldDecorator('title', {
+            rules: [
+              {
+                required: true,
+                message: 'Please input the title of post!'
+              }
+            ]
+          })(<Input/>)}
+        </FormItem>
+        <FormItem label="Post Content">
+          {getFieldDecorator('body', {
+            rules: [
+              {
+                required: true,
+                message: 'Please input the Post Body!'
+              }
+            ]
+          })(<Input type="textarea"/>)}
+        </FormItem>
+        <FormItem label="Author">
+          {getFieldDecorator('author', {
+            rules: [
+              {
+                required: true,
+                message: 'Please input the Author!'
+              }
+            ]
+          })(<Input/>)}
+        </FormItem>
+        <FormItem label="Category" hasFeedback>
+          {getFieldDecorator('select', {
+            rules: [
+              {
+                required: true,
+                message: 'Please select your post category!'
+              }
+            ]
+          })(
+            <Select placeholder="Please select a category">
+              {categories
+                &&(categories.categories.map((item) => (
+                  <Option key={item.name} value={item.name}>{item.name}</Option>
+              )))}
+            </Select>
+          )}
+        </FormItem>
+      </Form>
+    </Modal>
+  );
+});
+
+class AddPost extends React.Component {
+  state = {
+    confirmLoading: false
+  }
+  handleOk = () => {
+    this.setState({confirmLoading: true});
+    setTimeout(() => {
+      this.setState({confirmLoading: false});
+      this.props.closeModal()
+    }, 2000);
+  }
+  handleCancel = () => {
+    console.log('Clicked cancel button');
+    this.props.closeModal()
+  }
+  saveFormRef = (form) => {
+    this.form = form;
+  }
+  render() {
+    const { categories, visible } = this.props
+    const {confirmLoading} = this.state
+    return (
+      <div>
+        <NewPostForm
+          ref={this.saveFormRef}
+          categories={categories}
+          visible={visible}
+          onCancel={this.handleCancel}
+          onCreate={this.handleOk}
+          confirmLoading={confirmLoading}/>
+      </div>
+    );
+  }
+}
+const mapStateToProps = (state, props) => {
+  // console.log('state', state.categories['data'].categories)
+  return {
+    categories: state.categories['data'],
+    visible: state.modalvisible.newPostModalVisible,
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    closeModal: (data) => dispatch(closeNewPostModal())
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(AddPost)
+```
+
+![](http://ovc37dj11.bkt.clouddn.com/15065860470872.jpg)
 
 
 

@@ -35,7 +35,7 @@ class LayoutView extends React.Component {
       }
     }
   }
-  showModal(e) {
+  showModal(e){
     this.props.newPostModal()
   }
   render() {
