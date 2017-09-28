@@ -29,3 +29,16 @@ export const voteChange = (postId, option, callback) => {
     API.VotePost(postId, option, callback).then(data => dispatch(voteAction(data)))
   }
 }
+
+// 创建新的post
+export const newPost = (newPost) => {
+  return {
+    type: ActionType.ADD_NEW_POST,
+    newPost
+  }
+}
+export const addNewPost = (value, callback) => {
+  return dispatch => {
+    API.createPost(value, callback).then(data=>dispatch(newPost(data)))
+  }
+}

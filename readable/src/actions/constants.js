@@ -4,3 +4,4 @@ export const ALL_CATEGORIES = 'ALL_CATEGORIES'                      // 获取所
 export const CATEGORY_POSTS = 'CATEGORY_POSTS'                      // 获取一个分类下的所有posts
 export const ALL_POSTS = 'ALL_POSTS'                                // 获取所有 posts
 export const VOTE = 'VOTE'                                          // 投票功能
+export const ADD_NEW_POST = 'ADD_NEW_POST'                          // 增加新的 post

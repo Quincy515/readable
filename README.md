@@ -2115,5 +2115,73 @@ export default connect(mapStateToProps, mapDispatchToProps)(AddPost)
 
 ![](http://ovc37dj11.bkt.clouddn.com/15065860470872.jpg)
 
+[修改的 AddPost.js 代码](https://github.com/custertian/readable/commit/d2d9fa2f017828f8df38727a52f71a2f56189e7a#diff-71eabfe72c6dc16a4ef13674360a9264R1)
+
+#### 第八步：actions 
+
+```
+#File: src/actions/constants.js
+
+export const ADD_NEW_POST = 'ADD_NEW_POST'         // 增加新的 post
+```
+
+```
+#File: src/actions/posts.js
+
+// 创建新的post
+export const newPost = (newPost) => {
+  return {
+    type: ActionType.ADD_NEW_POST,
+    newPost
+  }
+}
+export const addNewPost = (value, callback) => {
+  return dispatch => {
+    API.createPost(value, callback).then(data=>dispatch(newPost(data)))
+  }
+}
+```
+
+#### 第九步： reducers
+
+```
+#File: src/reducers/posts.js
+
+case ActionType.ADD_NEW_POST:
+      return Object.assign({}, state, action.newPost)
+```
+
+#### 第十步： AddPost.js
+
+```
+handleOk = () => {
+    const form = this.form;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+      values.id = Math.random().toString(20)
+      values.timestamp = Date.now()
+      this.props.addNewPost(values,()=>{
+        console.log('Received values of form: ', values);
+
+        form.resetFields();
+        // this.setState({ visible: false });
+        this.setState({confirmLoading: true});
+        this.props.closeModal()
+        setTimeout(() => {
+          // this.setState({confirmLoading: false});
+          // this.props.closeModal()
+          window.location.reload()
+        }, 2000);
+      })
+    });
+  }
+```
+
+[AddPost.js 代码改动]()
+
+![](http://ovc37dj11.bkt.clouddn.com/15065913109235.jpg)
+
 
 

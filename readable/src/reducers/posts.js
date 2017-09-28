@@ -16,6 +16,9 @@ const AllPostsReducer = (state=[], action) => {
       // }
       return action.posts
 
+    case ActionType.ADD_NEW_POST:
+      return Object.assign({}, state, action.newPost)
+
     case ActionType.VOTE:
       console.log('$$ reducer posts')
       const newState = { ...state }

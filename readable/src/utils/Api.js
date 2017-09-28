@@ -63,6 +63,27 @@ export const fetchPost = () => {
   // })
 }
 
+/**
+ * POST /posts
+ *    USAGE:
+ *      Add a new post
+ *    PARAMS:
+ *      id - UUID should be fine, but any unique id will work
+ *      timestamp - timestamp in whatever format you like, you can use Date.now() if you like
+ *      title - String
+ *      body - String
+ *      author - String
+ *      category: Any of the categories listed in categories.js. Feel free to extend this list as you desire.
+ */
+export const createPost = (value, callback) => {
+  const request = axios({
+    method:'post',
+    url:`${api}/posts`,
+    data: value,
+    headers:{...headers},
+  }).then(()=>callback())
+  return request
+}
 
 /**
  * POST /posts/:id

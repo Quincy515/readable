@@ -2,6 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {Modal, Form, Input, Select} from 'antd';
 
+import { addNewPost } from '../actions/posts'
 import {closeNewPostModal} from '../actions/modalvisible'
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -49,7 +50,7 @@ const NewPostForm = Form.create()((props) => {
           })(<Input/>)}
         </FormItem>
         <FormItem label="Category" hasFeedback>
-          {getFieldDecorator('select', {
+          {getFieldDecorator('category', {
             rules: [
               {
                 required: true,
@@ -75,11 +76,27 @@ class AddPost extends React.Component {
     confirmLoading: false
   }
   handleOk = () => {
-    this.setState({confirmLoading: true});
-    setTimeout(() => {
-      this.setState({confirmLoading: false});
-      this.props.closeModal()
-    }, 2000);
+    const form = this.form;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+      values.id = Math.random().toString(20)
+      values.timestamp = Date.now()
+      this.props.addNewPost(values,()=>{
+        console.log('Received values of form: ', values);
+        this.setState({confirmLoading: true});
+        setTimeout(() => {
+          this.setState({confirmLoading: false});
+          this.props.closeModal()
+          form.resetFields();
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000);
+        }, 2000)
+
+      })
+    });
   }
   handleCancel = () => {
     console.log('Clicked cancel button');
@@ -105,7 +122,7 @@ class AddPost extends React.Component {
   }
 }
 const mapStateToProps = (state, props) => {
-  // console.log('state', state.categories['data'].categories)
+  console.log('state', state)
   return {
     categories: state.categories['data'],
     visible: state.modalvisible.newPostModalVisible,
@@ -113,7 +130,8 @@ const mapStateToProps = (state, props) => {
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    closeModal: (data) => dispatch(closeNewPostModal())
+    closeModal: (data) => dispatch(closeNewPostModal()),
+    addNewPost: (value, callback) => dispatch(addNewPost(value, callback))
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(AddPost)
