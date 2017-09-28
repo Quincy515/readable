@@ -1623,6 +1623,7 @@ export const fetchCategoryPosts = (category) => {
   })
 }
 ```
+[Api.js 改动](https://github.com/custertian/readable/commit/07a0a2863e9e2e918b974530ed2690df6c41c96b#diff-514f66f847494e5bb490f8ebddbe4089R26)
 
 #### 第二步： 增加 constants 常量
 
@@ -1652,6 +1653,7 @@ export const CategoryPostsFunc = () => {
   }
 }
 ```
+[actions/categories.js 改动](https://github.com/custertian/readable/commit/07a0a2863e9e2e918b974530ed2690df6c41c96b#diff-66c439ea099390b70d7274fca3003bdeR16)
 
 #### 第四步： 增加 reducers 
 
@@ -1662,8 +1664,303 @@ export const CategoryPostsFunc = () => {
 case ActionType.CATEGORY_POSTS:
       return action.categoryPosts
 ```
+[reducers/posts.js改动](https://github.com/custertian/readable/commit/07a0a2863e9e2e918b974530ed2690df6c41c96b#diff-cd546887e49424215db3c3ec3125123dL28)
 
 #### 第五步： 修改 ListView.js 和 Layout.js
 
-[改动在这里查看]()
+[ListView.js改动在这里查看](https://github.com/custertian/readable/commit/07a0a2863e9e2e918b974530ed2690df6c41c96b#diff-92a59bcb29677c04419ca01dd4e9b591L101)
+
+[Layout.js改动查看](https://github.com/custertian/readable/commit/07a0a2863e9e2e918b974530ed2690df6c41c96b#diff-7cb48bd8bf1c05c75667115932620d72R20)
+
+### 15. Add a new post 添加一个新的 post
+
+#### 第一步： 添加一个 Add Post 按钮
+
+```
+#File: src/containers/Layout.js
+
+          ....
+          <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+            <Button type="primary" onClick={this.showModal.bind(this)} icon="plus" style={{float: 'right'}} ghost>Add Post</Button>
+            {this.props.visible?<AddPost/>:<p></p>}
+            {this.state.curCategory?<h1>{this.state.curCategory}</h1>:<h1>All Posts</h1>}
+            <ListView posts={this.props.posts}/>
+          </div>
+          .....
+```
+
+![](http://ovc37dj11.bkt.clouddn.com/15065694252415.jpg)
+
+#### 第二步： antd 查找 modal 对话框组件
+
+确定使用这个  [异步关闭 - 点击确定后异步关闭对话框，例如提交表单。](https://ant.design/components/modal-cn/)
+
+```
+import { Modal, Button } from 'antd';
+
+class App extends React.Component {
+  state = {
+    ModalText: 'Content of the modal',
+    visible: false,
+    confirmLoading: false,
+  }
+  showModal = () => {
+    this.setState({
+      visible: true,
+    });
+  }
+  handleOk = () => {
+    this.setState({
+      ModalText: 'The modal will be closed after two seconds',
+      confirmLoading: true,
+    });
+    setTimeout(() => {
+      this.setState({
+        visible: false,
+        confirmLoading: false,
+      });
+    }, 2000);
+  }
+  handleCancel = () => {
+    console.log('Clicked cancel button');
+    this.setState({
+      visible: false,
+    });
+  }
+  render() {
+    const { visible, confirmLoading, ModalText } = this.state;
+    return (
+      <div>
+        <Button type="primary" onClick={this.showModal}>Open</Button>
+        <Modal title="Title"
+          visible={visible}
+          onOk={this.handleOk}
+          confirmLoading={confirmLoading}
+          onCancel={this.handleCancel}
+        >
+          <p>{ModalText}</p>
+        </Modal>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App />, mountNode);
+```
+
+新建一个 AddPost.js 文件来展示 这个对话框
+
+```
+#File: src/containers/AddPost.js
+
+import React from 'react'
+import { connect } from 'react-redux'
+import { Modal } from 'antd';
+import { closeNewPostModal } from '../actions/modalvisible'
+
+class AddPost extends React.Component {
+  state = {
+    ModalText: 'Content of the modal',
+    confirmLoading: false,
+  }
+  handleOk = () => {
+    this.setState({
+      ModalText: 'The modal will be closed after two seconds',
+      confirmLoading: true,
+    });
+    setTimeout(() => {
+      this.setState({
+        confirmLoading: false,
+      });
+      this.props.closeModal()
+    }, 2000);
+  }
+  handleCancel = () => {
+    console.log('Clicked cancel button');
+    this.props.closeModal()
+  }
+  render() {
+    const { confirmLoading, ModalText } = this.state;
+    return (
+      <div>
+        <Modal title="Title"
+          visible={this.props.visible}
+          onOk={this.handleOk}
+          confirmLoading={confirmLoading}
+          onCancel={this.handleCancel}
+        >
+          <p>{ModalText}</p>
+        </Modal>
+      </div>
+    );
+  }
+}
+const mapStateToProps = (state,props) => {
+  // console.log('state', state.modalvisible.newPostModalVisible)
+  return{ visible: state.modalvisible.newPostModalVisible }
+}
+const mapDispatchToProps = (dispatch) => {
+  return { closeModal: (data) => dispatch(closeNewPostModal()) }
+}
+export default AddPost
+```
+
+#### 第三步： 新建 actions creator modalvisible.js 
+
+先增加 actions 常量 constants.js
+
+```
+#File: src/actions/constants.js
+
+export const SHOW_NEW_POST_MODAL = 'SHOW_NEW_POST_MODAL'            // 显示Post Modal
+export const CLOSE_NEW_POST_MODAL = 'CLOSE_NEW_POST_MODAL'          // 关闭Post Modal
+```
+
+再增加 actions creator 代码
+
+```
+#File: src/actions/modalvisible.js
+
+import * as ActionType from './constants'
+
+export function newPost() {
+  return {
+    type: ActionType.SHOW_NEW_POST_MODAL
+  }
+}
+
+export function closeNewPostModal() {
+  return {
+    type: ActionType.CLOSE_NEW_POST_MODAL
+  }
+}
+```
+
+newPost() 打开Modal 
+
+closeNewPostModal() 关闭Modal
+
+#### 第四步： 新建 reducers modalvisible.js 
+
+```
+#File: src/reducers/modalvisible.js
+
+import * as ActionType from '../actions/constants'
+
+const initialState = {
+  newPostModalVisible: false,
+}
+const modalVisibleReducer = (state=initialState, action) => {
+  switch (action.type) {
+    case ActionType.SHOW_NEW_POST_MODAL:
+      return Object.assign({}, state, { newPostModalVisible: true })
+    case ActionType.CLOSE_NEW_POST_MODAL:
+      return Object.assign({}, state, { newPostModalVisible: false })
+    default:
+      return state
+  }
+}
+export default modalVisibleReducer
+```
+
+再修改 reducers.js 文件
+
+```
+#File: src/reducers/reducers.js
+
+import { combineReducers } from 'redux'
+import Categories from './categories'
+import Posts from './posts'
+import modalVisibleReducer from './modalvisible'
+
+const rootReducer = combineReducers({
+  categories: Categories,
+  posts: Posts,
+  modalvisible: modalVisibleReducer,
+})
+
+export default rootReducer
+```
+
+#### 第五步： 在 Layout 中针对 Add Post 按钮 添加 action dispatch 打开 Modal
+
+首先 增加 mapStateToProps 
+```
+    visible: state.modalvisible.newPostModalVisible,
+```
+和 mapDispatchToProps 
+
+```
+    newPostModal: (data) => dispatch(newPost()),
+```
+
+```
+const mapStateToProps = (state, props) => {
+  // console.log(categories.data)
+  // console.log('state', state.modalvisible.newPostModalVisible)
+  // console.log('props', props)
+  return {
+    posts: state.posts.data,
+    categories: state.categories['data'],
+    categoryPosts: state.categoryPosts,
+    visible: state.modalvisible.newPostModalVisible,
+   };
+}
+const mapDispatchToProps = (dispatch) => {
+  return{
+    fetchAllPosts: (data) => dispatch(addPost()),
+
+    fetchCategories: (data) => dispatch(CategoriesFunc()),
+    fetchCategoryPosts: (category) => dispatch(CategoryPostsFunc(category)),
+    newPostModal: (data) => dispatch(newPost()),
+  }
+}
+```
+
+在组件中使用 visible 和 newPost() 函数
+
+```
+showModal(e) {
+    this.props.newPostModal()
+  }
+  
+  ·····
+  
+  <Button type="primary" onClick={this.showModal.bind(this)} icon="plus" style={{float: 'right'}} ghost>Add Post</Button>
+            {this.props.visible?<AddPost/>:<p></p>}
+```
+
+效果如下：
+
+![](http://ovc37dj11.bkt.clouddn.com/15065705519297.jpg)
+
+可以看到 ```newPostModal: (data) => dispatch(newPost()),``` 控制 Modal 的打开
+
+```this.props.newPostModal()```
+
+#### 第六步： 完善 AddPost.js 代码 点击关闭 Modal 对话框
+
+```
+handleCancel = () => {
+    console.log('Clicked cancel button');
+    this.props.closeModal()
+  }
+  
+  ·····
+  
+const mapStateToProps = (state,props) => {
+  // console.log('state', state.modalvisible.newPostModalVisible)
+  return{ visible: state.modalvisible.newPostModalVisible }
+}
+const mapDispatchToProps = (dispatch) => {
+  return { closeModal: (data) => dispatch(closeNewPostModal()) }
+}
+```
+
+观察 Layout.js 和 AddPost.js 中的 visible state
+
+在不同组件中使用同一个 state 状态控制 Modal 可见还是隐藏
+
+
+
 

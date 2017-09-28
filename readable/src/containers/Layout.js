@@ -2,11 +2,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu, Breadcrumb, Button } from 'antd';
 
 import ListView from '../components/ListView'
+import AddPost from '../containers/AddPost'
 import { addPost } from '../actions/posts'
 import { CategoriesFunc, CategoryPostsFunc } from '../actions/categories'
+import { newPost } from '../actions/modalvisible'
 
 const { Header, Content, Footer } = Layout;
 
@@ -32,6 +34,9 @@ class LayoutView extends React.Component {
         this.setState({ curCategory: e.key})
       }
     }
+  }
+  showModal(e) {
+    this.props.newPostModal()
   }
   render() {
     const { categories } = this.props
@@ -70,6 +75,8 @@ class LayoutView extends React.Component {
             <Breadcrumb.Item><Link to='/'>Posts</Link></Breadcrumb.Item>
           </Breadcrumb>
           <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+            <Button type="primary" onClick={this.showModal.bind(this)} icon="plus" style={{float: 'right'}} ghost>Add Post</Button>
+            {this.props.visible?<AddPost/>:<p></p>}
             {this.state.curCategory?<h1>{this.state.curCategory}</h1>:<h1>All Posts</h1>}
             <ListView posts={this.props.posts}/>
           </div>
@@ -83,12 +90,13 @@ class LayoutView extends React.Component {
 }
 const mapStateToProps = (state, props) => {
   // console.log(categories.data)
-  // console.log('state', state.posts)
+  // console.log('state', state.modalvisible.newPostModalVisible)
   // console.log('props', props)
   return {
     posts: state.posts.data,
     categories: state.categories['data'],
     categoryPosts: state.categoryPosts,
+    visible: state.modalvisible.newPostModalVisible,
    };
 }
 const mapDispatchToProps = (dispatch) => {
@@ -97,6 +105,7 @@ const mapDispatchToProps = (dispatch) => {
 
     fetchCategories: (data) => dispatch(CategoriesFunc()),
     fetchCategoryPosts: (category) => dispatch(CategoryPostsFunc(category)),
+    newPostModal: (data) => dispatch(newPost()),
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(LayoutView)
