@@ -10,14 +10,23 @@ const AllPostsReducer = (state=[], action) => {
 
   switch (action.type) {
     case ActionType.ALL_POSTS:
+      // console.log('$$ all posts', action.posts)
       // return {
       //   ...state, // 对象扩展语法，与之前的状态相同
       //   data,     // 修改状态
       // }
-      return action.posts
+      // return action.posts
+      return action.posts.data.filter(post=>post.deleted===false)
 
     case ActionType.ADD_NEW_POST:
       return Object.assign({}, state, action.newPost)
+
+    case ActionType.DELETE_POST:
+      // console.log('$$ delete posts', state)
+      return Object.assign({}, state, {deleted: true})
+      // return state.data.filter((post) => {
+      //   return post.id !== action.postId
+      // })
 
     case ActionType.VOTE:
       console.log('$$ reducer posts')

@@ -2124,6 +2124,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(AddPost)
 
 export const ADD_NEW_POST = 'ADD_NEW_POST'         // 增加新的 post
 ```
+[constants 变动](https://github.com/custertian/readable/commit/f69ef68fa7f8285a0c0ca9ab566c6dfd0613be05#diff-53d1c58346fd0e26d124c47a8e40576fR6)
 
 ```
 #File: src/actions/posts.js
@@ -2141,6 +2142,7 @@ export const addNewPost = (value, callback) => {
   }
 }
 ```
+[actions 代码变动](https://github.com/custertian/readable/commit/f69ef68fa7f8285a0c0ca9ab566c6dfd0613be05#diff-135ca799a63cc5b186aea33f5faa330dR31)
 
 #### 第九步： reducers
 
@@ -2150,6 +2152,7 @@ export const addNewPost = (value, callback) => {
 case ActionType.ADD_NEW_POST:
       return Object.assign({}, state, action.newPost)
 ```
+[reducer代码变动](https://github.com/custertian/readable/commit/f69ef68fa7f8285a0c0ca9ab566c6dfd0613be05#diff-cd546887e49424215db3c3ec3125123dR18)
 
 #### 第十步： AddPost.js
 
@@ -2179,9 +2182,11 @@ handleOk = () => {
   }
 ```
 
-[AddPost.js 代码改动]()
+[AddPost.js 代码改动](https://github.com/custertian/readable/commit/f69ef68fa7f8285a0c0ca9ab566c6dfd0613be05#diff-71eabfe72c6dc16a4ef13674360a9264R78)
 
 ![](http://ovc37dj11.bkt.clouddn.com/15065913109235.jpg)
+
+### 16. Delete post 功能
 
 
 

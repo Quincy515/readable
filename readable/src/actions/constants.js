@@ -5,3 +5,4 @@ export const CATEGORY_POSTS = 'CATEGORY_POSTS'                      // 获取一
 export const ALL_POSTS = 'ALL_POSTS'                                // 获取所有 posts
 export const VOTE = 'VOTE'                                          // 投票功能
 export const ADD_NEW_POST = 'ADD_NEW_POST'                          // 增加新的 post
+export const DELETE_POST = 'DELETE_POST'                            // 删除post

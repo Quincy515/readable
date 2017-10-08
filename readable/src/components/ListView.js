@@ -1,8 +1,7 @@
 import React from 'react'
 import { Icon, Table } from 'antd';
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import {  voteChange } from '../actions/posts'
+import {  voteChange, deletePostAction } from '../actions/posts'
 import * as API from '../utils/Api'
 
 class ListView extends React.Component {
@@ -38,6 +37,13 @@ class ListView extends React.Component {
     this.props.vote(postId.id, option,()=>{
       window.location.reload()
       // this.props.history.push('/')
+    })
+  }
+  deleteFunc = async (postId) => {
+    this.props.deletePost(postId.id, ()=>{
+      console.log('deletePost',postId.id)
+      window.location.reload()
+      // window.location.reload()
     })
   }
   render() {
@@ -91,9 +97,16 @@ class ListView extends React.Component {
       key: 'action',
       render: (text, record) => (
         <span>
-          <Link to="/">Editor</Link>
+          <Icon type="edit" onClick={()=>{
+            const id = record.id;
+            this.deleteFunc({id})}}
+            style={{cursor: 'pointer',fontSize: 18, color: '#08c' }} />
           <span className="ant-divider" />
-          <Link to="/">Delete</Link>
+          <Icon type="delete" onClick={()=>{
+            console.log('record.id', record.id)
+            const id = record.id;
+            this.deleteFunc({id})}}
+            style={{cursor: 'pointer', fontSize: 18, color: '#08c' }} />
         </span>
       ),
     }];
@@ -111,14 +124,16 @@ class ListView extends React.Component {
 }
 const mapStateToProps = (state, props) => {
   // console.log('state', state)
-  // console.log('props', props)
-  return { posts: state.posts.data };
+  // console.log('props', props.posts)
+  // 数据格式的在处理 隐藏 deleted 为 true 的 post
+  return { posts: state.posts };
 }
 
 const mapDispatchToProps = (dispatch) => {
   return{
     // fetchAllPosts: (data) => dispatch(addPost()),
     vote: (postId, option, callback) => dispatch(voteChange(postId, option, callback)),
+    deletePost: (postId, callback) => dispatch(deletePostAction(postId, callback)),
   }
 }
 

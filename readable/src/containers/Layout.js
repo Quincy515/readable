@@ -76,7 +76,7 @@ class LayoutView extends React.Component {
           </Breadcrumb>
           <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
             <Button type="primary" onClick={this.showModal.bind(this)} icon="plus" style={{float: 'right'}} ghost>Add Post</Button>
-            {this.props.visible?<AddPost/>:<p></p>}
+            {this.props.visible?<AddPost/>:null}
             {this.state.curCategory?<h1>{this.state.curCategory}</h1>:<h1>All Posts</h1>}
             <ListView posts={this.props.posts}/>
           </div>
@@ -90,7 +90,7 @@ class LayoutView extends React.Component {
 }
 const mapStateToProps = (state, props) => {
   // console.log(categories.data)
-  // console.log('state', state.modalvisible.newPostModalVisible)
+  // console.log('state', state.posts.data)
   // console.log('props', props)
   return {
     posts: state.posts.data,

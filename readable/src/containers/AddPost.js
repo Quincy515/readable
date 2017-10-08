@@ -81,7 +81,7 @@ class AddPost extends React.Component {
       if (err) {
         return;
       }
-      values.id = Math.random().toString(20)
+      values.id = Math.random().toString(36).substr(-20)
       values.timestamp = Date.now()
       this.props.addNewPost(values,()=>{
         console.log('Received values of form: ', values);

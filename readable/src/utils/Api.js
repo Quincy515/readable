@@ -101,3 +101,17 @@ export const VotePost = (postId, option, callback) => {
   }).then(() => callback())
   return request
 }
+/**
+ * DELETE /posts/:id
+      USAGE:
+        Sets the deleted flag for a post to 'true'.
+        Sets the parentDeleted flag for all child comments to 'true'.
+ */
+export const DeletePost = (postId, callback) => {
+  const request = axios ({
+    method: 'delete',
+    url: `${api}/posts/${postId}`,
+    headers: {...headers},
+  }).then(()=>callback())
+  return request
+}

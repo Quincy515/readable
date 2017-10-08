@@ -42,3 +42,17 @@ export const addNewPost = (value, callback) => {
     API.createPost(value, callback).then(data=>dispatch(newPost(data)))
   }
 }
+
+//删除post
+export const deletePost = (postId) => {
+  return {
+    type: ActionType.DELETE_POST,
+    postId,
+  }
+}
+export const deletePostAction = (postId, callback) => {
+  console.log('deletePostAction')
+  return dispatch => {
+    API.DeletePost(postId, callback).then(data=>dispatch(deletePost(data)))
+  }
+}
