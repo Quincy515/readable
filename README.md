@@ -2403,7 +2403,68 @@ export default PostDetail
 
 ![](http://ovc37dj11.bkt.clouddn.com/15074462498491.jpg)
 
-[代码提交记录]()
+[代码提交记录](https://github.com/custertian/readable/commit/28915f12c3bb9ed918c381a24ca0490eb845888d#diff-c177a931a606a204d88d8ed04b28c6b4R1)
+
+#### 第五步： 把详细信息放入 卡片 中
+
+```
+Title: Udacity is the best place to learn React
+
+Body: Everyone says so after all.
+timestamp: 2016/6/29 上午10:21:12
+
+Vote score: 6
+
+Author: thingtwo
+
+comments number: 2
+```
+
+![](http://ovc37dj11.bkt.clouddn.com/15074550016902.jpg)
+
+没有实现[字数校验框](https://ant.design/docs/pattern/form-cn#字数校验框)
+
+这里在详细信息下面简单实现一个评论框：
+
+```
+<div style={{
+              margin: '24px 0'
+            }}>
+              <TextArea rows={6} placeholder="请输入评论..." size="large"/>
+              <Button type="primary" ghost style={{
+                margin: '24px 0',
+                float: 'right'
+              }}>comment</Button>
+            </div>
+```
+
+![](http://ovc37dj11.bkt.clouddn.com/15074550328068.jpg)
+
+在评论框下面放留言信息,使用[带连接线的树形控件](https://ant.design/components/tree-cn/)
+
+```
+<Tree showLine defaultExpandedKeys={['0-0-0']} onSelect={this.onSelect}>
+              <TreeNode title="parent 1" key="0-0">
+                <TreeNode title="parent 1-0" key="0-0-0">
+                  <TreeNode title="leaf" key="0-0-0-0"/>
+                  <TreeNode title="leaf" key="0-0-0-1"/>
+                  <TreeNode title="leaf" key="0-0-0-2"/>
+                </TreeNode>
+                <TreeNode title="parent 1-1" key="0-0-1">
+                  <TreeNode title="leaf" key="0-0-1-0"/>
+                </TreeNode>
+                <TreeNode title="parent 1-2" key="0-0-2">
+                  <TreeNode title="leaf" key="0-0-2-0"/>
+                  <TreeNode title="leaf" key="0-0-2-1"/>
+                </TreeNode>
+              </TreeNode>
+            </Tree>
+```
+
+这里的简单实现：
+
+![](http://ovc37dj11.bkt.clouddn.com/15074550910153.jpg)
+
 
 
 
