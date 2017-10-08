@@ -2315,6 +2315,7 @@ class App extends Component {
 
 export default App
 ```
+[App.js代码修改](https://github.com/custertian/readable/commit/a37b4b774d6bd9f3e0b555fc3392ef89dcdd7b10#diff-e0fd03c12dcf760d820d93bb8aa76feeR4)
 
 #### 第三步： 修改 ListView.js 增加对应的 Detail 连接
 
@@ -2328,7 +2329,7 @@ export default App
       render: (text, record) => (<Link to={`/${record.category}/${record.id}`}>{text}</Link>),
     },
 ```
-
+[ListView.js 代码修改](https://github.com/custertian/readable/commit/a37b4b774d6bd9f3e0b555fc3392ef89dcdd7b10#diff-92a59bcb29677c04419ca01dd4e9b591R1)
 现在效果图为：
 
 ![](http://ovc37dj11.bkt.clouddn.com/15074448972598.jpg)
@@ -2339,6 +2340,70 @@ export default App
 
 #### 第四步：书写详情页面的 UI
 
+详情页面的展示 以 [卡片的形式](https://ant.design/docs/spec/data-display-cn#卡片（Card）)
+
+```
+#File: readable/src/containers/PostDetail.js
+
+import React from 'react'
+import { Link } from 'react-router-dom'
+import {Card} from 'antd'
+import {Layout, Menu, Breadcrumb} from 'antd'
+const {Header, Content, Footer} = Layout
+
+class PostDetail extends React.Component {
+  render() {
+    return (
+      <Layout className="layout">
+        <Header>
+          <div className="logo"/>
+          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{
+            lineHeight: '64px', fontSize: '20px'
+          }}>
+            <Menu.Item key="1">Readable[Detail]</Menu.Item>
+          </Menu>
+        </Header>
+        <Content style={{
+          padding: '0 50px'
+        }}>
+          <Breadcrumb style={{
+            margin: '12px 0'
+          }}>
+            <Breadcrumb.Item><Link to='/'>Home</Link></Breadcrumb.Item>
+            <Breadcrumb.Item><Link to='/'>Posts</Link></Breadcrumb.Item>
+            <Breadcrumb.Item>detail</Breadcrumb.Item>
+          </Breadcrumb>
+          <div style={{
+            background: '#fff',
+            padding: 24,
+            minHeight: 280
+          }}>
+            <Card style={{
+              width: 300
+            }}>
+              <p>Card content</p>
+              <p>Card content</p>
+              <p>Card content</p>
+            </Card>
+          </div>
+        </Content>
+        <Footer style={{
+          textAlign: 'center'
+        }}>
+          Custer Tian ©2017 Created by Custer Tian
+        </Footer>
+      </Layout>
+
+    )
+  }
+}
+
+export default PostDetail
+```
+
+![](http://ovc37dj11.bkt.clouddn.com/15074462498491.jpg)
+
+[代码提交记录]()
 
 
 
