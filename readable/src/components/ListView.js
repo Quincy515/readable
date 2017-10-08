@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Icon, Table } from 'antd';
 import { connect } from 'react-redux'
 import {  voteChange, deletePostAction } from '../actions/posts'
@@ -79,6 +80,7 @@ class ListView extends React.Component {
       title: 'Title',
       dataIndex: 'title',
       width: '25%',
+      render: (text, record) => (<Link to={`/${record.category}/${record.id}`}>{text}</Link>),
     }, {
       title: 'Date',
       dataIndex: 'timestamp',

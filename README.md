@@ -2188,5 +2188,157 @@ handleOk = () => {
 
 ### 16. Delete post 功能
 
+#### 第一步： API.js 增加删除功能
+
+```
+#File: readable/src/utils/Api.js
+
+export const DeletePost = (postId, callback) => {
+ +  const request = axios ({
+ +    method: 'delete',
+ +    url: `${api}/posts/${postId}`,
+ +    headers: {...headers},
+ +  }).then(()=>callback())
+ +  return request
+ +}
+```
+[Api.js代码修改](https://github.com/custertian/readable/commit/765b38d341ed76d2421a281891b0b6fa7863eb1e#diff-514f66f847494e5bb490f8ebddbe4089L103)
+
+#### 第二步: actions 
+
+```
+#File: readable/src/actions/constants.js
+
+export const DELETE_POST = 'DELETE_POST'                            // 删除post
+```
+
+```
+#File:  readable/src/actions/posts.js
+
+//删除post
+ +export const deletePost = (postId) => {
+ +  return {
+ +    type: ActionType.DELETE_POST,
+ +    postId,
+ +  }
+ +}
+ +export const deletePostAction = (postId, callback) => {
+ +  console.log('deletePostAction')
+ +  return dispatch => {
+ +    API.DeletePost(postId, callback).then(data=>dispatch(deletePost(data)))
+ +  }
+ +}
+```
+[actions的代码修改](https://github.com/custertian/readable/commit/765b38d341ed76d2421a281891b0b6fa7863eb1e#diff-135ca799a63cc5b186aea33f5faa330dR44)
+
+#### 第三步：reducers的修改
+
+```
+#File: readable/src/reducers/posts.js
+
+   switch (action.type) {
+      case ActionType.ALL_POSTS:
+ +      // console.log('$$ all posts', action.posts)
+        // return {
+        //   ...state, // 对象扩展语法，与之前的状态相同
+        //   data,     // 修改状态
+        // }
+ -      return action.posts
+ +      // return action.posts
+ +      return action.posts.data.filter(post=>post.deleted===false)
+  
+      case ActionType.ADD_NEW_POST:
+        return Object.assign({}, state, action.newPost)
+  
+ +    case ActionType.DELETE_POST:
+ +      // console.log('$$ delete posts', state)
+ +      return Object.assign({}, state, {deleted: true})
+ +      // return state.data.filter((post) => {
+ +      //   return post.id !== action.postId
+ +      // })
+ +
+      case ActionType.VOTE:
+        console.log('$$ reducer posts')
+        const newState = { ...state }
+```
+
+[reducers 代码修改](https://github.com/custertian/readable/commit/765b38d341ed76d2421a281891b0b6fa7863eb1e#diff-cd546887e49424215db3c3ec3125123dR11)
+
+
+#### 第四步： 修改 View 层的代码    
+
+[File： readable/src/components/ListView.js](https://github.com/custertian/readable/commit/765b38d341ed76d2421a281891b0b6fa7863eb1e#diff-92a59bcb29677c04419ca01dd4e9b591R1)
+
+
+### 17. 详情页面的书写
+
+#### 第一步： 新建 Detail 页面
+
+```
+#File: readable/src/containers/PostDetail.js
+
+import React from 'react'
+
+class PostDetail extends React.Component {
+  render() {
+    return(
+      <div> PostDetail </div>
+    )
+  }
+}
+export default PostDetail
+```
+
+#### 第二步： 修改 App.js 增加 router 路由
+
+```
+#File: readable/src/App.js
+
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+
+import Layout from './containers/Layout'
+import PostDetail from './containers/PostDetail'
+
+class App extends Component {
+  render() {
+    return (
+      <Router>
+        <div>
+          <Route exact path='/' component={Layout}/>
+          <Route exact path='/:category/:post_id' component={PostDetail}/>
+        </div>
+      </Router>
+    );
+  }
+}
+
+export default App
+```
+
+#### 第三步： 修改 ListView.js 增加对应的 Detail 连接
+
+```
+#File: readable/src/components/ListView.js
+
+{
+      title: 'Title',
+      dataIndex: 'title',
+      width: '25%',
+      render: (text, record) => (<Link to={`/${record.category}/${record.id}`}>{text}</Link>),
+    },
+```
+
+现在效果图为：
+
+![](http://ovc37dj11.bkt.clouddn.com/15074448972598.jpg)
+
+点击 title 链接 进入 详情页面 如下图：
+
+![](http://ovc37dj11.bkt.clouddn.com/15074449792397.jpg)
+
+#### 第四步：书写详情页面的 UI
+
+
 
 
